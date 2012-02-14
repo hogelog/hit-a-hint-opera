@@ -32,6 +32,7 @@ function getKeyName(n){
 window.onload = function() {
   var hintkeys = widget.preferences.getItem('hintkeys');
   var startkey = widget.preferences.getItem('startkey');
+  var tabkey = widget.preferences.getItem('tabkey');
   var blacklist = widget.preferences.getItem('blacklist');
   if (blacklist) {
     blacklist = JSON.parse(blacklist);
@@ -41,15 +42,20 @@ window.onload = function() {
 
   var hk = document.getElementById('hintkeys');
   var sk = document.getElementById('startkey');
+  var tk = document.getElementById('tabkey');
   var hkb = document.getElementById('hintkeys_button');
   var skb = document.getElementById('startkey_button');
   var skh = document.getElementById('startkey_hidden');
+  var tkb = document.getElementById('tabkey_button');
+  var tkh = document.getElementById('tabkey_hidden');
   var bl = document.getElementById('blacklist');
   var blb = document.getElementById('blacklist_button');
 
   hk.value = hintkeys;
   skh.value = startkey;
+  tkh.value = tabkey;
   sk.value = getKeyName(startkey);
+  tk.value = getKeyName(tabkey);
   bl.value = blacklist.join('\n');
 
   hkb.onclick = function() {
@@ -86,6 +92,30 @@ window.onload = function() {
     }
   }
 
+  tk.onkeypress = function(e) {
+    var proceed = true;
+    var k = String.fromCharCode(e.keyCode);
+    if (!/\S/.test(k)) return;
+    e.preventDefault();
+    if (/[^a-zA-Z]/.test(k)) {
+      proceed = confirm("Keys other than a-z and A-Z may not work properly. Really proceed?");
+    }
+    if (proceed) {
+      var keynum = getKey(e);
+      tk.value = getKeyName(keynum);
+      tkh.value = keynum;
+    } else {
+      tk.value = '';
+      tkh.value = 0;
+    }
+  };
+
+  tkb.onclick = function() {
+    if (tk.value) {
+      widget.preferences.setItem('tabkey', tkh.value);
+    }
+  }
+
   blb.onclick = function() {
     blacklist = [];
     if (bl.value) {
@@ -110,6 +140,12 @@ window.onload = function() {
       <input type="text" id="startkey">
       <input type="hidden" id="startkey_hidden">
       <input type="button" id="startkey_button" value="save">
+    </p>
+    <p>
+      <label for="hintkeys">tabkey</label>
+      <input type="text" id="tabkey">
+      <input type="hidden" id="tabkey_hidden">
+      <input type="button" id="tabkey_button" value="save">
     </p>
     <h3>blacklist</h3>
     <p>URLs at which Hit-a-Hint should not start. ("*" is a wildcard, eg. http://*.google.*)</p>

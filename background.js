@@ -1,6 +1,7 @@
 
 var hintkeys = widget.preferences.getItem('hintkeys');
 var startkey = parseInt(widget.preferences.getItem('startkey'), 10);
+var tabkey = parseInt(widget.preferences.getItem('tabkey'), 10);
 var blacklist = widget.preferences.getItem('blacklist');
 if (!blacklist) {
   blacklist = [];
@@ -20,6 +21,8 @@ window.addEventListener('storage', function(e) {
     hintkeys = e.newValue;
   } else if (e.key === 'startkey') {
     startkey = parseInt(e.newValue, 10);
+  } else if (e.key === 'tabkey') {
+    tabkey = parseInt(e.newValue, 10);
   } else if (e.key === 'blacklist') {
     blacklist = JSON.parse(e.newValue);
   }
@@ -31,6 +34,7 @@ opera.extension.onmessage = function(e) {
       action: 'load',
       hintkeys: hintkeys,
       startkey: startkey,
+      tabkey: tabkey,
       blacklisted: isBlacklisted(e.data.url)
     });
   }

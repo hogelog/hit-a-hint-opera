@@ -1,10 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget xmlns="http://www.w3.org/ns/widgets" id="https://addons.opera.com/addons/extensions/details/hit-a-hint-for-opera/" version="1.0.3">
-  <name>Hit-a-Hint for Opera</name>
+<widget xmlns="http://www.w3.org/ns/widgets" id="https://addons.opera.com/addons/extensions/details/hit-a-hint-for-opera/" version="0.0.1">
+  <name>Hit-a-Hint for Opera (Fork)</name>
   <icon width="64" height="64" src="icons/icon64.png"/>
   <preference name="hintkeys" value="asdfghjkl"/>
   <preference name="startkey" value="102"/>
-  <!-- 102 is 'f' -->
+  <preference name="tabkey" value="1070"/>
+  <!-- 102 is 'f', 1070 is 'Shift+F' -->
   <license>Copyright 2011 edvakf
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +19,8 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.</license>
-  <author href="http://d.hatena.ne.jp/edvakf/">edvakf</author>
+  <!-- <author href="http://d.hatena.ne.jp/edvakf/">edvakf</author> -->
+  <author href="http://hogel.org/">hogelog</author>
   <update-description href="https://extension-updates.opera.com/api/w3c-wd1/update/e6d2884f-c7b2-42a8-99cf-83624354b59a/"/>
   <description xml:lang="en">Hit-a-Hint reimplemented for Opera</description>
   <description xml:lang="ja">Hit-a-Hint を Opera に移植しました</description>

@@ -1,18 +1,27 @@
+const CODE_SHIFT = 1000;
+const CODE_CTRL = 10000;
+const CODE_ALT = 100000;
+const CODE_RETURN = 13;
 var hintkeys = 'asdfghjkl';
 var startkey = 102;
+var tabkey = 70 + CODE_SHIFT;
 var blacklisted = false;
+var startKeys = [];
 
 opera.extension.postMessage({action:'load', url: window.location.href});
 opera.extension.onmessage = function(e){
   if (e.data.action === 'load') {
     if (e.data.hintkeys) hintkeys = e.data.hintkeys;
     if (e.data.startkey) startkey = e.data.startkey;
+    if (e.data.tabkey) tabkey = e.data.tabkey;
     if (e.data.blacklisted) blacklisted = e.data.blacklisted;
   }
+  startKeys.push(startkey);
+  startKeys.push(tabkey);
 };
 
 function getKey(e){
-  return e.altKey * 100000 + e.ctrlKey * 10000 + e.shiftKey * 1000 + e.keyCode;
+  return e.altKey * CODE_ALT + e.ctrlKey * CODE_CTRL + e.shiftKey * CODE_SHIFT + e.keyCode;
 }
 
 
@@ -77,6 +86,7 @@ window.addEventListener('keypress', function(evt){
   function num(s) {
     return parseFloat(s) || 0;
   }
+  var tabopen = false;
   var hints = [];
   function drawHints() {
     var body = window.getComputedStyle(document.body);
@@ -169,8 +179,17 @@ window.addEventListener('keypress', function(evt){
     document.removeEventListener('focus',focusFix,true);
   }
   function handler(e){
-    var key = String.fromCharCode(e.keyCode);
+    var code = e.keyCode;
+    var key = String.fromCharCode(code);
     if (hintkeys.indexOf(key) >= 0) return pushLetter(key, e);
+    else if (code == CODE_RETURN) {
+      e.preventDefault();
+      var openEvent = document.createEvent('MouseEvent');
+      console.log(tabopen);
+      openEvent.initMouseEvent('click', null, null, window, 1, 0, 0, 0, 0, tabopen, false, false, false, 0, null);
+      e.target.dispatchEvent(openEvent);
+      console.log(openEvent);
+    }
     unloadHaH();
   }
   function initHaH(){
@@ -188,8 +207,10 @@ window.addEventListener('keypress', function(evt){
   function init(){
     var keyid = getKey(evt);
     var target = evt.target;
-    if (keyid === startkey && !document.getElementById('HaH-div-element')) {
-      if (keyid >= 10000 || !isInputable(target)) {
+    if (startKeys.indexOf(keyid) != -1 && !document.getElementById('HaH-div-element')) {
+      tabopen = keyid == tabkey;
+      console.log(tabopen);
+      if (keyid >= CODE_CTRL || !isInputable(target)) {
         evt.preventDefault();
         return initHaH();
       }
