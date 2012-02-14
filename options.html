@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset=utf-8>
+    <title>Hit-a-Hint for Opera</title>
+    <style>
+      textarea#blacklist {
+        display: block;
+        width: 100%;
+        height: 20em;
+      }
+    </style>
+    <script>
+function getKey(e){
+  return e.altKey * 100000 + e.ctrlKey * 10000 + e.shiftKey * 1000 + e.keyCode;
+}
+
+function getKeyName(n){
+  try {
+    var k = [];
+    if (n / 100000 >= 1) k.push('Alt'), n = n % 100000;
+    if (n / 10000 >= 1) k.push('Ctrl'), n = n % 10000;
+    if (n / 1000 >= 1) k.push('Shift'), n = n % 1000;
+    k.push(String.fromCharCode(n).toLowerCase());
+    return k.join('+');
+  } catch(e) {
+    console.log(e);
+    return '';
+  }
+}
+
+window.onload = function() {
+  var hintkeys = widget.preferences.getItem('hintkeys');
+  var startkey = widget.preferences.getItem('startkey');
+  var blacklist = widget.preferences.getItem('blacklist');
+  if (blacklist) {
+    blacklist = JSON.parse(blacklist);
+  } else {
+    blacklist = [];
+  }
+
+  var hk = document.getElementById('hintkeys');
+  var sk = document.getElementById('startkey');
+  var hkb = document.getElementById('hintkeys_button');
+  var skb = document.getElementById('startkey_button');
+  var skh = document.getElementById('startkey_hidden');
+  var bl = document.getElementById('blacklist');
+  var blb = document.getElementById('blacklist_button');
+
+  hk.value = hintkeys;
+  skh.value = startkey;
+  sk.value = getKeyName(startkey);
+  bl.value = blacklist.join('\n');
+
+  hkb.onclick = function() {
+    var proceed = true;
+    if (/[^a-zA-Z0-9]/.test(hk.value)) {
+      proceed = confirm("Keys other than a-z, A-Z and 0-9 may not work properly. Really proceed?");
+    }
+    if (proceed) {
+      widget.preferences.setItem('hintkeys', hk.value);
+    }
+  };
+
+  sk.onkeypress = function(e) {
+    var proceed = true;
+    var k = String.fromCharCode(e.keyCode);
+    if (!/\S/.test(k)) return;
+    e.preventDefault();
+    if (/[^a-zA-Z]/.test(k)) {
+      proceed = confirm("Keys other than a-z and A-Z may not work properly. Really proceed?");
+    }
+    if (proceed) {
+      var keynum = getKey(e);
+      sk.value = getKeyName(keynum);
+      skh.value = keynum;
+    } else {
+      sk.value = '';
+      skh.value = 0;
+    }
+  };
+
+  skb.onclick = function() {
+    if (sk.value) {
+      widget.preferences.setItem('startkey', skh.value);
+    }
+  }
+
+  blb.onclick = function() {
+    blacklist = [];
+    if (bl.value) {
+      bl.value.split(/\r?\n/).forEach(function(line) {
+        blacklist.push(line);
+      });
+    }
+    widget.preferences.setItem('blacklist', JSON.stringify(blacklist));
+  }
+}
+    </script>
+  </head>
+  <body>
+    <h1>Hit-a-Hint for Opera</h1>
+    <p>
+      <label for="hintkeys">hintkeys</label>
+      <input type="text" id="hintkeys">
+      <input type="button" id="hintkeys_button" value="save">
+    </p>
+    <p>
+      <label for="hintkeys">startkey</label>
+      <input type="text" id="startkey">
+      <input type="hidden" id="startkey_hidden">
+      <input type="button" id="startkey_button" value="save">
+    </p>
+    <h3>blacklist</h3>
+    <p>URLs at which Hit-a-Hint should not start. ("*" is a wildcard, eg. http://*.google.*)</p>
+    <textarea id="blacklist"></textarea>
+    <input type="button" id="blacklist_button" value="save">
+  </body>
+</head>
